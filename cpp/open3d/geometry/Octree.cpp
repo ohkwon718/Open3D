@@ -143,6 +143,44 @@ OctreeInternalPointNode::GetUpdateFunction(size_t idx) {
     };
 }
 
+
+
+void OctreeInternalNode::AssignChild(int index, const std::shared_ptr<OctreeNode>& child) {
+    // Check if the index is valid
+    if (index >= 0 && index < 8) {
+        if (children_[index]) {
+            // Check if the previous child at the index was an internal node            
+            if (auto internal_node = std::dynamic_pointer_cast<OctreeInternalNode>(children_[index])) {
+                // recursively delete all descendant nodes
+                internal_node->DeleteDescendants();            
+            } 
+            // Reset the previous child at the index        
+            children_[index].reset();
+        }
+        
+        // Assign the new child at the index
+        children_[index] = child;
+    } else {
+        // Handle the case where the index is out of range
+        throw std::out_of_range("Invalid child index");
+    }
+}
+
+
+void OctreeInternalNode::DeleteDescendants() {
+    for (auto& child : children_) {
+        if (child) {            
+            if (auto internal_node = std::dynamic_pointer_cast<OctreeInternalNode>(child)) {
+                internal_node->DeleteDescendants();
+            }
+            child.reset();
+        }
+    }
+}
+
+
+
+
 bool OctreeInternalPointNode::ConvertToJsonValue(Json::Value& value) const {
     // TODO: use inheritance here (copy value, change class_name to base class)
     bool rc = true;

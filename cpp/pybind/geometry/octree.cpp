@@ -104,6 +104,8 @@ void pybind_octree(py::module &m) {
                           << " non-empty child nodes";
                      return repr.str();
                  })
+            .def("assign_child", &OctreeInternalNode::AssignChild, "index"_a, "child"_a,
+                "Assign a child as a node")
             .def_static(
                     "get_init_function", &OctreeInternalNode::GetInitFunction,
                     "Get lambda function for initializing OctreeInternalNode. "
@@ -120,7 +122,10 @@ void pybind_octree(py::module &m) {
                                        &OctreeInternalNode::children_,
                                        "List of children Nodes.");
     docstring::ClassMethodDocInject(m, "OctreeInternalNode", "__init__");
-
+    docstring::ClassMethodDocInject(
+            m, "OctreeInternalNode", "assign_child",
+            {{"index", "the index to be the child node"},
+             {"child", "a node to be assigned"}});
     // OctreeInternalPointNode
     py::class_<OctreeInternalPointNode, PyOctreeNode<OctreeInternalPointNode>,
                std::shared_ptr<OctreeInternalPointNode>, OctreeInternalNode>

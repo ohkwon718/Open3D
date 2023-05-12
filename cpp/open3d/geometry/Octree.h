@@ -122,6 +122,9 @@ public:
     bool ConvertToJsonValue(Json::Value& value) const override;
     bool ConvertFromJsonValue(const Json::Value& value) override;
 
+    void AssignChild(int index, const std::shared_ptr<OctreeNode>& child);
+    void DeleteDescendants();
+
 public:
     /// Use vector instead of C-array for Pybind11, otherwise, need to define
     /// more helper functions
