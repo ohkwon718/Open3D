@@ -67,23 +67,23 @@ static void AddVoxelFaces(geometry::TriangleMesh& mesh,
     }
 }
 
-static void AddLineFace(geometry::TriangleMesh& mesh,
-                        const Eigen::Vector3d& start,
-                        const Eigen::Vector3d& end,
-                        const Eigen::Vector3d& half_width,
-                        const Eigen::Vector3d& color) {
-    int n = int(mesh.vertices_.size());
-    mesh.triangles_.push_back({n, n + 1, n + 3});
-    mesh.triangles_.push_back({n, n + 3, n + 2});
-    mesh.vertices_.push_back(start - half_width);
-    mesh.vertices_.push_back(start + half_width);
-    mesh.vertices_.push_back(end - half_width);
-    mesh.vertices_.push_back(end + half_width);
-    mesh.vertex_colors_.push_back(color);
-    mesh.vertex_colors_.push_back(color);
-    mesh.vertex_colors_.push_back(color);
-    mesh.vertex_colors_.push_back(color);
-}
+// static void AddLineFace(geometry::TriangleMesh& mesh,
+//                         const Eigen::Vector3d& start,
+//                         const Eigen::Vector3d& end,
+//                         const Eigen::Vector3d& half_width,
+//                         const Eigen::Vector3d& color) {
+//     int n = int(mesh.vertices_.size());
+//     mesh.triangles_.push_back({n, n + 1, n + 3});
+//     mesh.triangles_.push_back({n, n + 3, n + 2});
+//     mesh.vertices_.push_back(start - half_width);
+//     mesh.vertices_.push_back(start + half_width);
+//     mesh.vertices_.push_back(end - half_width);
+//     mesh.vertices_.push_back(end + half_width);
+//     mesh.vertex_colors_.push_back(color);
+//     mesh.vertex_colors_.push_back(color);
+//     mesh.vertex_colors_.push_back(color);
+//     mesh.vertex_colors_.push_back(color);
+// }
 
 static std::shared_ptr<geometry::TriangleMesh> CreateTriangleMeshFromVoxelGrid(
         const geometry::VoxelGrid& voxel_grid) {
@@ -145,28 +145,28 @@ static std::shared_ptr<geometry::TriangleMesh> CreateTriangleMeshFromOctree(
         if (leaf_node) {
             AddVoxelFaces(mesh, vertices, leaf_node->color_);
         } else {
-            // We cannot have lines in a TriangleMesh, obviously, so fake them
-            // with two crossing planes.
-            for (const Eigen::Vector2i& line_vertex_indices :
-                 kCuboidLinesVertexIndices) {
-                auto& start = vertices[line_vertex_indices(0)];
-                auto& end = vertices[line_vertex_indices(1)];
-                Eigen::Vector3d w(line_half_width, 0.0, 0.0);
-                // if (end - start).dot({1, 0, 0}) ~= 0, then use z, not x
-                if (std::abs(end.y() - start.y()) < 0.1 &&
-                    std::abs(end.z() - start.z()) < 0.1) {
-                    w = {0.0, 0.0, line_half_width};
-                }
-                AddLineFace(mesh, start, end, w, {0.0, 0.0, 0.0});
+            // // We cannot have lines in a TriangleMesh, obviously, so fake them
+            // // with two crossing planes.
+            // for (const Eigen::Vector2i& line_vertex_indices :
+            //      kCuboidLinesVertexIndices) {
+            //     auto& start = vertices[line_vertex_indices(0)];
+            //     auto& end = vertices[line_vertex_indices(1)];
+            //     Eigen::Vector3d w(line_half_width, 0.0, 0.0);
+            //     // if (end - start).dot({1, 0, 0}) ~= 0, then use z, not x
+            //     if (std::abs(end.y() - start.y()) < 0.1 &&
+            //         std::abs(end.z() - start.z()) < 0.1) {
+            //         w = {0.0, 0.0, line_half_width};
+            //     }
+            //     AddLineFace(mesh, start, end, w, {0.0, 0.0, 0.0});
 
-                w = {0.0, line_half_width, 0.0};
-                // if (end - start).dot({0, 1, 0}) ~= 0, then use z, not y
-                if (std::abs(end.x() - start.x()) < 0.1 &&
-                    std::abs(end.z() - start.z()) < 0.1) {
-                    w = {0.0, 0.0, line_half_width};
-                }
-                AddLineFace(mesh, start, end, w, {0.0, 0.0, 0.0});
-            }
+            //     w = {0.0, line_half_width, 0.0};
+            //     // if (end - start).dot({0, 1, 0}) ~= 0, then use z, not y
+            //     if (std::abs(end.x() - start.x()) < 0.1 &&
+            //         std::abs(end.z() - start.z()) < 0.1) {
+            //         w = {0.0, 0.0, line_half_width};
+            //     }
+            //     AddLineFace(mesh, start, end, w, {0.0, 0.0, 0.0});
+            // }
         }
 
         return false;
